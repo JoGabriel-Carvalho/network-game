@@ -25,7 +25,7 @@ ChartJS.register(
 const SignalSimulator = () => {
 	const initialSegments = Array(8).fill({
 		amplitude: 50,
-		frequency: 1,
+		frequency: 1, // Frequência inicial definida como 1
 		phase: 0,
 		correct: false,
 	});
@@ -34,7 +34,7 @@ const SignalSimulator = () => {
 	const [selectedSegment, setSelectedSegment] = useState(0);
 	const [binaryNumber, setBinaryNumber] = useState("");
 	const [amplitudeValues, setAmplitudeValues] = useState({ zero: 0, one: 0 });
-	const [frequencyValues, setFrequencyValues] = useState({ zero: 1, one: 1 });
+	const [frequencyValues, setFrequencyValues] = useState({ zero: 2, one: 2 });
 	const [phaseValues, setPhaseValues] = useState({ zero: 0, one: Math.PI });
 	const [currentStage, setCurrentStage] = useState("amplitude");
 	const [allSegmentsCorrect, setAllSegmentsCorrect] = useState(false);
@@ -75,17 +75,11 @@ const SignalSimulator = () => {
 
 			let zeroFrequency, oneFrequency;
 			do {
-				zeroFrequency = Math.floor(Math.random() * 5) + 1;
-				oneFrequency = Math.floor(Math.random() * 5) + 1;
+				zeroFrequency = Math.floor(Math.random() * 4) + 2; // Valores entre 2 e 5
+				oneFrequency = Math.floor(Math.random() * 4) + 2; // Valores entre 2 e 5
 			} while (zeroFrequency === oneFrequency);
 
 			setFrequencyValues({ zero: zeroFrequency, one: oneFrequency });
-
-			const randomPhase = Math.random() < 0.5 ? 0 : Math.PI;
-			setPhaseValues({
-				zero: randomPhase,
-				one: randomPhase === 0 ? Math.PI : 0,
-			});
 
 			const newSegments = initialSegments.map((segment, index) => {
 				const bit = binary[index];
@@ -95,13 +89,9 @@ const SignalSimulator = () => {
 				const correctFrequency =
 					segment.frequency ===
 					(bit === "1" ? oneFrequency : zeroFrequency);
-				const correctPhase =
-					segment.phase ===
-					(bit === "1" ? phaseValues.one : phaseValues.zero);
 				return {
 					...segment,
-					correct:
-						correctAmplitude && correctFrequency && correctPhase,
+					correct: correctAmplitude && correctFrequency,
 				};
 			});
 			setSegments(newSegments);
@@ -114,18 +104,15 @@ const SignalSimulator = () => {
 	}, []);
 
 	useEffect(() => {
-		if (currentStage === "frequency" || currentStage === "phase") {
+		if (currentStage === "frequency") {
 			const newSegments = segments.map((segment, index) => {
 				const bit = binaryNumber[index];
 				const targetFrequency =
 					bit === "1" ? frequencyValues.one : frequencyValues.zero;
-				const targetPhase =
-					bit === "1" ? phaseValues.one : phaseValues.zero;
 				const correctFrequency = segment.frequency === targetFrequency;
-				const correctPhase = segment.phase === targetPhase;
 				return {
 					...segment,
-					correct: correctFrequency && correctPhase,
+					correct: correctFrequency,
 				};
 			});
 			setSegments(newSegments);
@@ -133,7 +120,25 @@ const SignalSimulator = () => {
 				newSegments.every((segment) => segment.correct)
 			);
 		}
-	}, [currentStage, frequencyValues, phaseValues, binaryNumber]);
+
+		if (currentStage === "phase") {
+			const randomPhaseSegments = segments.map((segment, index) => {
+				const bit = binaryNumber[index];
+				const randomPhase = Math.random() < 0.5 ? 0 : Math.PI;
+				const targetPhase =
+					bit === "1" ? randomPhase : randomPhase === 0 ? Math.PI : 0;
+				return {
+					...segment,
+					phase: randomPhase, // Define a fase inicial aleatória para cada segmento
+					correct: segment.correct && segment.phase === targetPhase,
+				};
+			});
+			setSegments(randomPhaseSegments);
+			setAllSegmentsCorrect(
+				randomPhaseSegments.every((segment) => segment.correct)
+			);
+		}
+	}, [currentStage]);
 
 	const updateSegment = (prop, value) => {
 		const newSegments = [...segments];
