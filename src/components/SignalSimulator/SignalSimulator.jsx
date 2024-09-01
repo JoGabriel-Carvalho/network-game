@@ -31,11 +31,12 @@ const SignalSimulator = () => {
 	});
 
 	const [segments, setSegments] = useState(initialSegments);
-	const [selectedSegment, setSelectedSegment] = useState(0); // Segmento inicialmente selecionado
+	const [selectedSegment, setSelectedSegment] = useState(0);
 	const [binaryNumber, setBinaryNumber] = useState("");
 	const [amplitudeValues, setAmplitudeValues] = useState({ zero: 0, one: 0 });
 	const [frequencyValues, setFrequencyValues] = useState({ zero: 1, one: 1 });
-	const [currentStage, setCurrentStage] = useState("amplitude"); // Define o estágio inicial
+	const [phaseValues, setPhaseValues] = useState({ zero: 0, one: Math.PI });
+	const [currentStage, setCurrentStage] = useState("amplitude");
 	const [allSegmentsCorrect, setAllSegmentsCorrect] = useState(false);
 
 	useEffect(() => {
@@ -80,6 +81,12 @@ const SignalSimulator = () => {
 
 			setFrequencyValues({ zero: zeroFrequency, one: oneFrequency });
 
+			const randomPhase = Math.random() < 0.5 ? 0 : Math.PI;
+			setPhaseValues({
+				zero: randomPhase,
+				one: randomPhase === 0 ? Math.PI : 0,
+			});
+
 			const newSegments = initialSegments.map((segment, index) => {
 				const bit = binary[index];
 				const correctAmplitude =
@@ -89,7 +96,8 @@ const SignalSimulator = () => {
 					segment.frequency ===
 					(bit === "1" ? oneFrequency : zeroFrequency);
 				const correctPhase =
-					segment.phase === (bit === "1" ? Math.PI : 0);
+					segment.phase ===
+					(bit === "1" ? phaseValues.one : phaseValues.zero);
 				return {
 					...segment,
 					correct:
@@ -106,15 +114,18 @@ const SignalSimulator = () => {
 	}, []);
 
 	useEffect(() => {
-		if (currentStage === "frequency") {
+		if (currentStage === "frequency" || currentStage === "phase") {
 			const newSegments = segments.map((segment, index) => {
 				const bit = binaryNumber[index];
 				const targetFrequency =
 					bit === "1" ? frequencyValues.one : frequencyValues.zero;
+				const targetPhase =
+					bit === "1" ? phaseValues.one : phaseValues.zero;
 				const correctFrequency = segment.frequency === targetFrequency;
+				const correctPhase = segment.phase === targetPhase;
 				return {
 					...segment,
-					correct: segment.correct || correctFrequency,
+					correct: correctFrequency && correctPhase,
 				};
 			});
 			setSegments(newSegments);
@@ -122,7 +133,7 @@ const SignalSimulator = () => {
 				newSegments.every((segment) => segment.correct)
 			);
 		}
-	}, [currentStage, frequencyValues, binaryNumber]);
+	}, [currentStage, frequencyValues, phaseValues, binaryNumber]);
 
 	const updateSegment = (prop, value) => {
 		const newSegments = [...segments];
@@ -155,6 +166,17 @@ const SignalSimulator = () => {
 			);
 		}
 
+		if (currentStage === "phase") {
+			const bit = binaryNumber[selectedSegment];
+			const phase = newSegments[selectedSegment].phase;
+			const targetPhase =
+				bit === "1" ? phaseValues.one : phaseValues.zero;
+			newSegments[selectedSegment].correct = phase === targetPhase;
+			setAllSegmentsCorrect(
+				newSegments.every((segment) => segment.correct)
+			);
+		}
+
 		setSegments(newSegments);
 	};
 
@@ -162,7 +184,7 @@ const SignalSimulator = () => {
 		if (currentStage === "phase") {
 			const currentPhase = segments[selectedSegment].phase;
 			const newPhase = currentPhase === 0 ? Math.PI : 0;
-			updateSegment("phase", newPhase);
+			updateSegment("phase", newPhase - currentPhase); // Altera a fase corretamente ao clicar várias vezes
 		}
 	};
 
@@ -255,6 +277,18 @@ const SignalSimulator = () => {
 						<p className="amplitude-info">
 							<strong>Frequência para 1:</strong>{" "}
 							{frequencyValues.one}
+						</p>
+					</>
+				)}
+				{currentStage === "phase" && (
+					<>
+						<p className="amplitude-info">
+							<strong>Fase para 0:</strong>{" "}
+							{phaseValues.zero === 0 ? "0°" : "180°"}
+						</p>
+						<p className="amplitude-info">
+							<strong>Fase para 1:</strong>{" "}
+							{phaseValues.one === 0 ? "0°" : "180°"}
 						</p>
 					</>
 				)}
