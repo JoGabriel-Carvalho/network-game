@@ -23,39 +23,106 @@ ChartJS.register(
 );
 
 const SignalSimulator = () => {
-	const [segments, setSegments] = useState(
-		Array(8).fill({
-			amplitude: 50,
-			frequency: 1,
-			phase: 0,
-			correct: false,
-		})
-	);
+	const initialSegments = Array(8).fill({
+		amplitude: 50,
+		frequency: 1,
+		phase: 0,
+		correct: false,
+	});
+
+	const [segments, setSegments] = useState(initialSegments);
 	const [selectedSegment, setSelectedSegment] = useState(0); // Segmento inicialmente selecionado
 	const [binaryNumber, setBinaryNumber] = useState("");
 	const [amplitudeValues, setAmplitudeValues] = useState({ zero: 0, one: 0 });
+	const [frequencyValues, setFrequencyValues] = useState({ zero: 1, one: 1 });
+	const [currentStage, setCurrentStage] = useState("amplitude"); // Define o estágio inicial
+	const [allSegmentsCorrect, setAllSegmentsCorrect] = useState(false);
 
 	useEffect(() => {
-		// Gera um número binário de 8 dígitos aleatório e define os valores de amplitude
-		const generateBinaryNumberAndAmplitude = () => {
+		const generateBinaryNumberAndValues = () => {
 			let binary = "";
+			let countZero = 0;
+			let countOne = 0;
+
 			for (let i = 0; i < 8; i++) {
-				binary += Math.floor(Math.random() * 2);
+				if (countZero < 2 && countOne < 2) {
+					const bit = Math.floor(Math.random() * 2);
+					binary += bit;
+					bit === 0 ? countZero++ : countOne++;
+				} else if (countZero < 2) {
+					binary += "0";
+					countZero++;
+				} else if (countOne < 2) {
+					binary += "1";
+					countOne++;
+				} else {
+					const bit = Math.floor(Math.random() * 2);
+					binary += bit;
+					bit === 0 ? countZero++ : countOne++;
+				}
 			}
+
 			setBinaryNumber(binary);
 
-			// Define os valores de amplitude como múltiplos de 20, garantindo que sejam diferentes
 			let zeroAmplitude, oneAmplitude;
 			do {
-				zeroAmplitude = Math.floor(Math.random() * 5 + 1) * 20; // Múltiplos de 20 entre 20 e 100
-				oneAmplitude = Math.floor(Math.random() * 5 + 1) * 20; // Múltiplos de 20 entre 20 e 100
+				zeroAmplitude = Math.floor(Math.random() * 5 + 1) * 20;
+				oneAmplitude = Math.floor(Math.random() * 5 + 1) * 20;
 			} while (zeroAmplitude === oneAmplitude);
 
 			setAmplitudeValues({ zero: zeroAmplitude, one: oneAmplitude });
+
+			let zeroFrequency, oneFrequency;
+			do {
+				zeroFrequency = Math.floor(Math.random() * 5) + 1;
+				oneFrequency = Math.floor(Math.random() * 5) + 1;
+			} while (zeroFrequency === oneFrequency);
+
+			setFrequencyValues({ zero: zeroFrequency, one: oneFrequency });
+
+			const newSegments = initialSegments.map((segment, index) => {
+				const bit = binary[index];
+				const correctAmplitude =
+					segment.amplitude ===
+					(bit === "1" ? oneAmplitude : zeroAmplitude);
+				const correctFrequency =
+					segment.frequency ===
+					(bit === "1" ? oneFrequency : zeroFrequency);
+				const correctPhase =
+					segment.phase === (bit === "1" ? Math.PI : 0);
+				return {
+					...segment,
+					correct:
+						correctAmplitude && correctFrequency && correctPhase,
+				};
+			});
+			setSegments(newSegments);
+			setAllSegmentsCorrect(
+				newSegments.every((segment) => segment.correct)
+			);
 		};
 
-		generateBinaryNumberAndAmplitude();
+		generateBinaryNumberAndValues();
 	}, []);
+
+	useEffect(() => {
+		if (currentStage === "frequency") {
+			const newSegments = segments.map((segment, index) => {
+				const bit = binaryNumber[index];
+				const targetFrequency =
+					bit === "1" ? frequencyValues.one : frequencyValues.zero;
+				const correctFrequency = segment.frequency === targetFrequency;
+				return {
+					...segment,
+					correct: segment.correct || correctFrequency,
+				};
+			});
+			setSegments(newSegments);
+			setAllSegmentsCorrect(
+				newSegments.every((segment) => segment.correct)
+			);
+		}
+	}, [currentStage, frequencyValues, binaryNumber]);
 
 	const updateSegment = (prop, value) => {
 		const newSegments = [...segments];
@@ -64,20 +131,49 @@ const SignalSimulator = () => {
 			[prop]: newSegments[selectedSegment][prop] + value,
 		};
 
-		// Verifica se a amplitude está correta
-		const bit = binaryNumber[selectedSegment];
-		const amplitude = newSegments[selectedSegment].amplitude;
-		const targetAmplitude =
-			bit === "1" ? amplitudeValues.one : amplitudeValues.zero;
-		newSegments[selectedSegment].correct = amplitude === targetAmplitude;
+		if (currentStage === "amplitude") {
+			const bit = binaryNumber[selectedSegment];
+			const amplitude = newSegments[selectedSegment].amplitude;
+			const targetAmplitude =
+				bit === "1" ? amplitudeValues.one : amplitudeValues.zero;
+			newSegments[selectedSegment].correct =
+				amplitude === targetAmplitude;
+			setAllSegmentsCorrect(
+				newSegments.every((segment) => segment.correct)
+			);
+		}
+
+		if (currentStage === "frequency") {
+			const bit = binaryNumber[selectedSegment];
+			const frequency = newSegments[selectedSegment].frequency;
+			const targetFrequency =
+				bit === "1" ? frequencyValues.one : frequencyValues.zero;
+			newSegments[selectedSegment].correct =
+				frequency === targetFrequency;
+			setAllSegmentsCorrect(
+				newSegments.every((segment) => segment.correct)
+			);
+		}
 
 		setSegments(newSegments);
 	};
 
 	const togglePhase = () => {
-		const currentPhase = segments[selectedSegment].phase;
-		const newPhase = currentPhase === 0 ? Math.PI : 0;
-		updateSegment("phase", newPhase);
+		if (currentStage === "phase") {
+			const currentPhase = segments[selectedSegment].phase;
+			const newPhase = currentPhase === 0 ? Math.PI : 0;
+			updateSegment("phase", newPhase);
+		}
+	};
+
+	const advanceStage = () => {
+		if (currentStage === "amplitude") {
+			setCurrentStage("frequency");
+		} else if (currentStage === "frequency") {
+			setCurrentStage("phase");
+		}
+		setSegments(initialSegments);
+		setAllSegmentsCorrect(false);
 	};
 
 	const generateSignalData = () => {
@@ -86,14 +182,13 @@ const SignalSimulator = () => {
 
 		segments.forEach((segment, segmentIndex) => {
 			for (let i = 0; i < 100; i++) {
-				// 100 pontos para garantir um ciclo completo, podendo variar conforme a frequência
-				const x = (i / 100) * 2 * Math.PI; // Gera um ciclo completo de 0 a 2π
+				const x = (i / 100) * 2 * Math.PI * segment.frequency;
 				const y =
 					(segment.amplitude / 100) *
 					100 *
-					Math.sin(segment.frequency * x + segment.phase);
+					Math.sin(x + segment.phase);
 				data.push(y);
-				labels.push(segmentIndex * 100 + i); // Adiciona a posição do segmento
+				labels.push(segmentIndex * 100 + i);
 			}
 		});
 
@@ -103,10 +198,10 @@ const SignalSimulator = () => {
 				{
 					label: "Sinal",
 					data,
-					borderColor: "white", // Linha do sinal em branco
+					borderColor: "white",
 					borderWidth: 3,
 					fill: false,
-					pointRadius: 0, // Remove os pontos (bolinhas)
+					pointRadius: 0,
 				},
 			],
 		};
@@ -115,17 +210,17 @@ const SignalSimulator = () => {
 	const chartOptions = {
 		scales: {
 			x: {
-				display: false, // Remove os números do eixo horizontal
+				display: false,
 			},
 			y: {
-				min: -100, // Limite inferior do eixo Y
-				max: 100, // Limite superior do eixo Y
+				min: -100,
+				max: 100,
 				ticks: {
 					stepSize: 20,
-					color: "white", // Define a cor da linha horizontal para branco
+					color: "white",
 				},
 				grid: {
-					color: "rgba(255, 255, 255, 0.2)", // Grade mais sutil
+					color: "rgba(255, 255, 255, 0.2)",
 				},
 			},
 		},
@@ -136,15 +231,33 @@ const SignalSimulator = () => {
 	return (
 		<div className="signal-simulator">
 			<div className="info-display">
-				<p>
+				<p className="binary-number">
 					<strong>Bits a serem transmitidos:</strong> {binaryNumber}
 				</p>
-				<p>
-					<strong>Amplitude para 0:</strong> {amplitudeValues.zero}
-				</p>
-				<p>
-					<strong>Amplitude para 1:</strong> {amplitudeValues.one}
-				</p>
+				{currentStage === "amplitude" && (
+					<>
+						<p className="amplitude-info">
+							<strong>Amplitude para 0:</strong>{" "}
+							{amplitudeValues.zero}
+						</p>
+						<p className="amplitude-info">
+							<strong>Amplitude para 1:</strong>{" "}
+							{amplitudeValues.one}
+						</p>
+					</>
+				)}
+				{currentStage === "frequency" && (
+					<>
+						<p className="amplitude-info">
+							<strong>Frequência para 0:</strong>{" "}
+							{frequencyValues.zero}
+						</p>
+						<p className="amplitude-info">
+							<strong>Frequência para 1:</strong>{" "}
+							{frequencyValues.one}
+						</p>
+					</>
+				)}
 			</div>
 			<div className="number-display">
 				{segments.map((segment, index) => (
@@ -168,20 +281,41 @@ const SignalSimulator = () => {
 				))}
 			</div>
 			<div className="controls">
-				<button onClick={() => updateSegment("amplitude", 10)}>
-					Aumentar Amplitude
-				</button>
-				<button onClick={() => updateSegment("amplitude", -10)}>
-					Diminuir Amplitude
-				</button>
-				<button onClick={() => updateSegment("frequency", 1)}>
-					Aumentar Frequência
-				</button>
-				<button onClick={() => updateSegment("frequency", -1)}>
-					Diminuir Frequência
-				</button>
-				<button onClick={togglePhase}>Alternar Fase</button>
+				{currentStage === "amplitude" && (
+					<>
+						<button onClick={() => updateSegment("amplitude", 10)}>
+							Aumentar Amplitude
+						</button>
+						<button onClick={() => updateSegment("amplitude", -10)}>
+							Diminuir Amplitude
+						</button>
+					</>
+				)}
+				{currentStage === "frequency" && (
+					<>
+						<button onClick={() => updateSegment("frequency", 1)}>
+							Aumentar Frequência
+						</button>
+						<button onClick={() => updateSegment("frequency", -1)}>
+							Diminuir Frequência
+						</button>
+					</>
+				)}
+				{currentStage === "phase" && (
+					<button onClick={togglePhase}>Alternar Fase</button>
+				)}
 			</div>
+			{allSegmentsCorrect && currentStage !== "phase" && (
+				<div className="advance-button">
+					<button
+						className="advance-stage-button"
+						onClick={advanceStage}
+					>
+						Avançar para{" "}
+						{currentStage === "amplitude" ? "Frequência" : "Fase"}
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };
