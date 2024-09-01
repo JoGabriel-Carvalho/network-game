@@ -86,7 +86,6 @@ const Checksum = ({ bits = "" }) => {
 
 			{checksumResult && (
 				<div className="checksum-result">
-					Resultado: {checksumResult}
 					{isChecksumCorrect !== null && (
 						<p
 							className={

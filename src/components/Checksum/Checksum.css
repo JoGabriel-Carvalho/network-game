@@ -1,11 +1,11 @@
 /* Contêiner Principal */
 .checksum-container {
-	padding: 20px;
+	padding: 40px;
 	background-color: #1e1e1e;
 	color: white;
 	border-radius: 10px;
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-	width: 600px; /* Ajustado para um tamanho mais razoável */
+	width: 1000px; /* Ajustado para um tamanho mais razoável */
 	margin: 50px auto; /* Centralizado verticalmente com margem superior */
 	text-align: center;
 	font-family: Arial, sans-serif;
