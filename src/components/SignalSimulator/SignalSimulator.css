@@ -1,0 +1,96 @@
+.signal-simulator {
+	padding: 20px;
+	background-color: #1e1e1e;
+	color: white;
+	border-radius: 10px;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	width: 1000px;
+	margin: 0 auto;
+}
+
+.info-display {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.info-display .binary-number {
+	font-size: 32px; /* Tamanho da fonte aumentado para 2x */
+}
+
+.info-display .amplitude-info {
+	font-size: 16px; /* Fonte menor para as informações de amplitude */
+}
+
+.number-display {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+}
+
+.number-box {
+	width: 50px;
+	height: 50px;
+	margin: 0 5px;
+	background-color: #3a3a3a;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 5px;
+	font-size: 20px; /* Mantém o tamanho original */
+	font-weight: bold;
+}
+
+.chart-container {
+	width: 100%; /* Usa toda a largura disponível */
+	height: 400px; /* Define uma altura fixa */
+	margin-bottom: 20px;
+	border-radius: 10px;
+}
+
+.signal-simulator h2 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.segment-selector {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 20px;
+}
+
+.segment-selector button {
+	margin: 0 5px;
+	padding: 10px 20px;
+	background-color: #3a3a3a;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.segment-selector button.selected {
+	background-color: #ff5722; /* Cor diferente para o segmento selecionado */
+}
+
+.controls {
+	display: flex;
+	justify-content: space-around;
+	margin-top: 20px;
+}
+
+.controls button {
+	padding: 15px 30px;
+	background-color: #2196f3;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	font-size: 16px;
+}
+
+.controls button:hover {
+	background-color: #1976d2;
+}
