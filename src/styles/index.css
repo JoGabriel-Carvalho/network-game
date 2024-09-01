@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap");
+
+body {
+	margin: 0;
+	font-family: "Nunito", sans-serif;
+	background-color: #f4f4f4;
+}
+
+.App {
+	text-align: center;
+	padding: 20px;
+}
