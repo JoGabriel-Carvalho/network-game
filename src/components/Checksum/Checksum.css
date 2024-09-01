@@ -1,0 +1,118 @@
+/* Contêiner Principal */
+.checksum-container {
+	padding: 20px;
+	background-color: #1e1e1e;
+	color: white;
+	border-radius: 10px;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	width: 600px; /* Ajustado para um tamanho mais razoável */
+	margin: 50px auto; /* Centralizado verticalmente com margem superior */
+	text-align: center;
+	font-family: Arial, sans-serif;
+}
+
+/* Título */
+.checksum-title {
+	margin-bottom: 30px;
+	font-size: 24px;
+}
+
+/* Seção de Bits */
+.bit-section {
+	margin-bottom: 30px;
+}
+
+/* Linha de Bits */
+.bit-row {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+/* Caixa de Bit */
+.bit-box {
+	width: 60px; /* Aumentado para melhor visibilidade */
+	height: 60px;
+	margin: 0 5px;
+	background-color: #3a3a3a;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 5px;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+/* Caixa de Operador (+) */
+.operator-box {
+	background-color: #2c2c2c;
+	font-size: 28px;
+}
+
+/* Caixa Vazia (Placeholder) */
+.empty-box {
+	background-color: transparent; /* Transparente para não mostrar nada */
+	border: 2px dashed #3a3a3a; /* Opcional: adicionar uma borda tracejada para indicar espaço */
+}
+
+/* Seção de Resposta */
+.answer-section {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 30px;
+}
+
+/* Inputs da Resposta */
+.sum-input {
+	width: 60px;
+	height: 60px;
+	margin: 0 5px;
+	text-align: center;
+	font-size: 24px;
+	border-radius: 5px;
+	border: 2px solid #2c2c2c;
+	background-color: #2c2c2c;
+	color: white;
+	outline: none;
+	transition: border-color 0.3s;
+}
+
+.sum-input:focus {
+	border-color: #2196f3;
+}
+
+/* Botão de Verificação */
+.checksum-button {
+	padding: 15px 30px;
+	background-color: #2196f3;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 18px;
+	transition: background-color 0.3s, transform 0.2s;
+}
+
+.checksum-button:hover {
+	background-color: #1976d2;
+	transform: scale(1.05);
+}
+
+/* Resultado da Verificação */
+.checksum-result {
+	margin-top: 20px;
+	font-size: 20px;
+}
+
+/* Estilos para Resposta Correta e Incorreta */
+.correct {
+	color: #4caf50;
+	margin-top: 10px;
+}
+
+.incorrect {
+	color: #f44336;
+	margin-top: 10px;
+}

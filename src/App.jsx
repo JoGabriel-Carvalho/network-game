@@ -1,11 +1,11 @@
 import React from "react";
-import TopologyCanvas from "./components/TopologyCanvas/TopologyCanvas";
 import SignalSimulator from "./components/SignalSimulator/SignalSimulator";
+import Checksum from "./components/Checksum/Checksum";
 
 function App() {
 	return (
 		<div className="App">
-			<SignalSimulator />
+			<Checksum bits="11010011" />
 		</div>
 	);
 }
