@@ -1,28 +1,37 @@
-import React, { useState } from "react";
-import { Stage, Layer, Line, Rect } from "react-konva";
+import React, { useState, useRef, useEffect } from "react";
+import { Stage, Layer, Line, Image } from "react-konva";
+import computerImgSrc from "../../util/images/computer.png";
+import routerImgSrc from "../../util/images/router.png";
 
-const Device = ({ id, x, y, onDrag, onRightClick }) => (
-	<Rect
-		x={x}
-		y={y}
-		width={40}
-		height={40}
-		fill="blue"
-		shadowBlur={5}
-		cornerRadius={5}
-		draggable
-		onDragMove={(e) => onDrag(id, e.target.x(), e.target.y())}
-		onContextMenu={(e) => {
-			e.evt.preventDefault(); // Prevenir o menu de contexto padrão
-			onRightClick(id, x, y);
-		}}
-	/>
-);
+const URLImage = ({ image, x, y, onDragMove, onRightClick }) => {
+	const [img] = useState(new window.Image());
+	const imageRef = useRef(null);
+
+	useEffect(() => {
+		img.src = image.src;
+		img.onload = () => {
+			imageRef.current.image(img);
+			imageRef.current.getLayer().batchDraw();
+		};
+	}, [img, image.src]);
+
+	return (
+		<Image
+			x={x}
+			y={y}
+			ref={imageRef}
+			draggable
+			onDragMove={onDragMove}
+			onContextMenu={onRightClick}
+			width={50}
+			height={50}
+		/>
+	);
+};
 
 const ControlPanel = ({ addDevice }) => (
 	<div style={{ marginBottom: "10px" }}>
 		<button onClick={() => addDevice("computer")}>Add Computer</button>
-		<button onClick={() => addDevice("phone")}>Add Phone</button>
 		<button onClick={() => addDevice("router")}>Add Router</button>
 	</div>
 );
@@ -34,11 +43,18 @@ const TopologyCanvas = () => {
 
 	const addDevice = (type) => {
 		const id = `${type}-${devices.length + 1}`;
-		const newDevice = { id, type, x: 50, y: 50 };
+		const newDevice = {
+			id,
+			type,
+			x: Math.random() * 400,
+			y: Math.random() * 400,
+			imgSrc: type === "computer" ? computerImgSrc : routerImgSrc,
+		};
 		setDevices([...devices, newDevice]);
 	};
 
-	const handleDrag = (id, x, y) => {
+	const handleDragMove = (id, e) => {
+		const { x, y } = e.target.position();
 		setDevices(
 			devices.map((device) =>
 				device.id === id ? { ...device, x, y } : device
@@ -46,18 +62,18 @@ const TopologyCanvas = () => {
 		);
 	};
 
-	const handleRightClick = (id, x, y) => {
+	const handleRightClick = (id, e) => {
+		e.evt.preventDefault(); // Prevent the default context menu
 		if (selectedDevice) {
 			if (selectedDevice !== id) {
-				// Adiciona uma nova conexão entre os dois dispositivos
 				setConnections([
 					...connections,
 					{ from: selectedDevice, to: id },
 				]);
-				setSelectedDevice(null); // Resetar após a conexão
+				setSelectedDevice(null);
 			}
 		} else {
-			setSelectedDevice(id); // Seleciona o primeiro dispositivo
+			setSelectedDevice(id);
 		}
 	};
 
@@ -81,10 +97,10 @@ const TopologyCanvas = () => {
 							<Line
 								key={index}
 								points={[
-									fromDevice.x + 20,
-									fromDevice.y + 20,
-									toDevice.x + 20,
-									toDevice.y + 20,
+									fromDevice.x + 25,
+									fromDevice.y + 25,
+									toDevice.x + 25,
+									toDevice.y + 25,
 								]}
 								stroke="black"
 								strokeWidth={2}
@@ -92,13 +108,13 @@ const TopologyCanvas = () => {
 						);
 					})}
 					{devices.map((device) => (
-						<Device
+						<URLImage
 							key={device.id}
-							id={device.id}
+							image={{ src: device.imgSrc }}
 							x={device.x}
 							y={device.y}
-							onDrag={handleDrag}
-							onRightClick={handleRightClick}
+							onDragMove={(e) => handleDragMove(device.id, e)}
+							onRightClick={(e) => handleRightClick(device.id, e)}
 						/>
 					))}
 				</Layer>
