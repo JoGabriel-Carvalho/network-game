@@ -322,12 +322,12 @@ const SignalSimulator = () => {
 							<button
 								onClick={() => updateSegment("amplitude", 10)}
 							>
-								Aumentar Amplitude
+								Aumentar amplitude
 							</button>
 							<button
 								onClick={() => updateSegment("amplitude", -10)}
 							>
-								Diminuir Amplitude
+								Diminuir amplitude
 							</button>
 						</>
 					)}
@@ -336,17 +336,17 @@ const SignalSimulator = () => {
 							<button
 								onClick={() => updateSegment("frequency", 1)}
 							>
-								Aumentar Frequência
+								Aumentar frequência
 							</button>
 							<button
 								onClick={() => updateSegment("frequency", -1)}
 							>
-								Diminuir Frequência
+								Diminuir frequência
 							</button>
 						</>
 					)}
 					{currentStage === "phase" && (
-						<button onClick={togglePhase}>Alternar Fase</button>
+						<button onClick={togglePhase}>Alternar fase</button>
 					)}
 				</div>
 				{allSegmentsCorrect && currentStage !== "phase" && (
