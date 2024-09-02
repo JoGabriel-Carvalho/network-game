@@ -1,0 +1,17 @@
+.start-page-container {
+	text-align: center;
+	margin-top: 100px;
+}
+
+.name-input {
+	padding: 10px;
+	font-size: 16px;
+	margin-bottom: 20px;
+	width: 300px;
+}
+
+.start-button {
+	padding: 10px 20px;
+	font-size: 16px;
+	cursor: pointer;
+}

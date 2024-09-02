@@ -122,20 +122,20 @@ const SignalSimulator = () => {
 		}
 
 		if (currentStage === "phase") {
-			const randomPhaseSegments = segments.map((segment, index) => {
+			const updatedSegments = segments.map((segment, index) => {
 				const bit = binaryNumber[index];
-				const randomPhase = Math.random() < 0.5 ? 0 : Math.PI;
 				const targetPhase =
-					bit === "1" ? randomPhase : randomPhase === 0 ? Math.PI : 0;
+					bit === "1" ? phaseValues.one : phaseValues.zero;
+				const correctPhase = segment.phase === targetPhase;
+
 				return {
 					...segment,
-					phase: randomPhase, // Define a fase inicial aleatória para cada segmento
-					correct: segment.correct && segment.phase === targetPhase,
+					correct: correctPhase, // Verifica se a fase já está correta
 				};
 			});
-			setSegments(randomPhaseSegments);
+			setSegments(updatedSegments);
 			setAllSegmentsCorrect(
-				randomPhaseSegments.every((segment) => segment.correct)
+				updatedSegments.every((segment) => segment.correct)
 			);
 		}
 	}, [currentStage]);
