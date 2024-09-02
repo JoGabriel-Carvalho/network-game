@@ -46,20 +46,16 @@ const SignalSimulator = () => {
 			let countOne = 0;
 
 			for (let i = 0; i < 8; i++) {
-				if (countZero < 2 && countOne < 2) {
+				if (countZero < 4 && countOne < 4) {
 					const bit = Math.floor(Math.random() * 2);
 					binary += bit;
 					bit === 0 ? countZero++ : countOne++;
-				} else if (countZero < 2) {
+				} else if (countZero < 4) {
 					binary += "0";
 					countZero++;
-				} else if (countOne < 2) {
+				} else if (countOne < 4) {
 					binary += "1";
 					countOne++;
-				} else {
-					const bit = Math.floor(Math.random() * 2);
-					binary += bit;
-					bit === 0 ? countZero++ : countOne++;
 				}
 			}
 
