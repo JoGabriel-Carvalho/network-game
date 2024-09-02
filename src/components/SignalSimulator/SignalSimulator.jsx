@@ -315,42 +315,54 @@ const SignalSimulator = () => {
 					</button>
 				))}
 			</div>
-			<div className="controls">
-				{currentStage === "amplitude" && (
-					<>
-						<button onClick={() => updateSegment("amplitude", 10)}>
-							Aumentar Amplitude
+			<div className="controls-container">
+				<div className="controls">
+					{currentStage === "amplitude" && (
+						<>
+							<button
+								onClick={() => updateSegment("amplitude", 10)}
+							>
+								Aumentar Amplitude
+							</button>
+							<button
+								onClick={() => updateSegment("amplitude", -10)}
+							>
+								Diminuir Amplitude
+							</button>
+						</>
+					)}
+					{currentStage === "frequency" && (
+						<>
+							<button
+								onClick={() => updateSegment("frequency", 1)}
+							>
+								Aumentar Frequência
+							</button>
+							<button
+								onClick={() => updateSegment("frequency", -1)}
+							>
+								Diminuir Frequência
+							</button>
+						</>
+					)}
+					{currentStage === "phase" && (
+						<button onClick={togglePhase}>Alternar Fase</button>
+					)}
+				</div>
+				{allSegmentsCorrect && currentStage !== "phase" && (
+					<div className="advance-button">
+						<button
+							className="advance-stage-button"
+							onClick={advanceStage}
+						>
+							Avançar para{" "}
+							{currentStage === "amplitude"
+								? "Frequência"
+								: "Fase"}
 						</button>
-						<button onClick={() => updateSegment("amplitude", -10)}>
-							Diminuir Amplitude
-						</button>
-					</>
-				)}
-				{currentStage === "frequency" && (
-					<>
-						<button onClick={() => updateSegment("frequency", 1)}>
-							Aumentar Frequência
-						</button>
-						<button onClick={() => updateSegment("frequency", -1)}>
-							Diminuir Frequência
-						</button>
-					</>
-				)}
-				{currentStage === "phase" && (
-					<button onClick={togglePhase}>Alternar Fase</button>
+					</div>
 				)}
 			</div>
-			{allSegmentsCorrect && currentStage !== "phase" && (
-				<div className="advance-button">
-					<button
-						className="advance-stage-button"
-						onClick={advanceStage}
-					>
-						Avançar para{" "}
-						{currentStage === "amplitude" ? "Frequência" : "Fase"}
-					</button>
-				</div>
-			)}
 		</div>
 	);
 };
