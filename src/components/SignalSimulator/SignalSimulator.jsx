@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
+import Checksum from "../Checksum/Checksum"; // Importando o componente Checksum
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -38,6 +39,7 @@ const SignalSimulator = () => {
 	const [phaseValues, setPhaseValues] = useState({ zero: 0, one: Math.PI });
 	const [currentStage, setCurrentStage] = useState("amplitude");
 	const [allSegmentsCorrect, setAllSegmentsCorrect] = useState(false);
+	const [showChecksum, setShowChecksum] = useState(false); // Controle para mostrar o checksum
 
 	useEffect(() => {
 		const generateBinaryNumberAndValues = () => {
@@ -199,6 +201,10 @@ const SignalSimulator = () => {
 		setAllSegmentsCorrect(false);
 	};
 
+	const goToChecksum = () => {
+		setShowChecksum(true); // Alterna a exibição para o Checksum
+	};
+
 	const generateSignalData = () => {
 		const data = [];
 		const labels = [];
@@ -253,116 +259,147 @@ const SignalSimulator = () => {
 
 	return (
 		<div className="signal-simulator">
-			<div className="info-display">
-				<p className="binary-number">
-					<strong>Bits a serem transmitidos:</strong> {binaryNumber}
-				</p>
-				{currentStage === "amplitude" && (
-					<>
-						<p className="amplitude-info">
-							<strong>Amplitude para 0:</strong>{" "}
-							{amplitudeValues.zero}
+			{showChecksum ? (
+				<Checksum bits={binaryNumber} /> // Passa os bits para o componente Checksum
+			) : (
+				<>
+					<div className="info-display">
+						<p className="binary-number">
+							<strong>Bits a serem transmitidos:</strong>{" "}
+							{binaryNumber}
 						</p>
-						<p className="amplitude-info">
-							<strong>Amplitude para 1:</strong>{" "}
-							{amplitudeValues.one}
-						</p>
-					</>
-				)}
-				{currentStage === "frequency" && (
-					<>
-						<p className="amplitude-info">
-							<strong>Frequência para 0:</strong>{" "}
-							{frequencyValues.zero}
-						</p>
-						<p className="amplitude-info">
-							<strong>Frequência para 1:</strong>{" "}
-							{frequencyValues.one}
-						</p>
-					</>
-				)}
-				{currentStage === "phase" && (
-					<>
-						<p className="amplitude-info">
-							<strong>Fase para 0:</strong>{" "}
-							{phaseValues.zero === 0 ? "0°" : "180°"}
-						</p>
-						<p className="amplitude-info">
-							<strong>Fase para 1:</strong>{" "}
-							{phaseValues.one === 0 ? "0°" : "180°"}
-						</p>
-					</>
-				)}
-			</div>
-			<div className="number-display">
-				{segments.map((segment, index) => (
-					<div key={index} className="number-box">
-						{segment.correct ? binaryNumber[index] : ""}
+						{currentStage === "amplitude" && (
+							<>
+								<p className="amplitude-info">
+									<strong>Amplitude para 0:</strong>{" "}
+									{amplitudeValues.zero}
+								</p>
+								<p className="amplitude-info">
+									<strong>Amplitude para 1:</strong>{" "}
+									{amplitudeValues.one}
+								</p>
+							</>
+						)}
+						{currentStage === "frequency" && (
+							<>
+								<p className="amplitude-info">
+									<strong>Frequência para 0:</strong>{" "}
+									{frequencyValues.zero}
+								</p>
+								<p className="amplitude-info">
+									<strong>Frequência para 1:</strong>{" "}
+									{frequencyValues.one}
+								</p>
+							</>
+						)}
+						{currentStage === "phase" && (
+							<>
+								<p className="amplitude-info">
+									<strong>Fase para 0:</strong>{" "}
+									{phaseValues.zero === 0 ? "0°" : "180°"}
+								</p>
+								<p className="amplitude-info">
+									<strong>Fase para 1:</strong>{" "}
+									{phaseValues.one === 0 ? "0°" : "180°"}
+								</p>
+							</>
+						)}
 					</div>
-				))}
-			</div>
-			<div className="chart-container">
-				<Line data={generateSignalData()} options={chartOptions} />
-			</div>
-			<div className="segment-selector">
-				{segments.map((_, index) => (
-					<button
-						key={index}
-						className={index === selectedSegment ? "selected" : ""}
-						onClick={() => setSelectedSegment(index)}
-					>
-						Segmento {index + 1}
-					</button>
-				))}
-			</div>
-			<div className="controls-container">
-				<div className="controls">
-					{currentStage === "amplitude" && (
-						<>
-							<button
-								onClick={() => updateSegment("amplitude", 10)}
-							>
-								Aumentar amplitude
-							</button>
-							<button
-								onClick={() => updateSegment("amplitude", -10)}
-							>
-								Diminuir amplitude
-							</button>
-						</>
-					)}
-					{currentStage === "frequency" && (
-						<>
-							<button
-								onClick={() => updateSegment("frequency", 1)}
-							>
-								Aumentar frequência
-							</button>
-							<button
-								onClick={() => updateSegment("frequency", -1)}
-							>
-								Diminuir frequência
-							</button>
-						</>
-					)}
-					{currentStage === "phase" && (
-						<button onClick={togglePhase}>Alternar fase</button>
-					)}
-				</div>
-				{allSegmentsCorrect && currentStage !== "phase" && (
-					<div className="advance-button">
-						<button
-							className="advance-stage-button"
-							onClick={advanceStage}
-						>
-							Avançar para{" "}
-							{currentStage === "amplitude"
-								? "Frequência"
-								: "Fase"}
-						</button>
+					<div className="number-display">
+						{segments.map((segment, index) => (
+							<div key={index} className="number-box">
+								{segment.correct ? binaryNumber[index] : ""}
+							</div>
+						))}
 					</div>
-				)}
-			</div>
+					<div className="chart-container">
+						<Line
+							data={generateSignalData()}
+							options={chartOptions}
+						/>
+					</div>
+					<div className="segment-selector">
+						{segments.map((_, index) => (
+							<button
+								key={index}
+								className={
+									index === selectedSegment ? "selected" : ""
+								}
+								onClick={() => setSelectedSegment(index)}
+							>
+								Segmento {index + 1}
+							</button>
+						))}
+					</div>
+					<div className="controls-container">
+						<div className="controls">
+							{currentStage === "amplitude" && (
+								<>
+									<button
+										onClick={() =>
+											updateSegment("amplitude", 10)
+										}
+									>
+										Aumentar amplitude
+									</button>
+									<button
+										onClick={() =>
+											updateSegment("amplitude", -10)
+										}
+									>
+										Diminuir amplitude
+									</button>
+								</>
+							)}
+							{currentStage === "frequency" && (
+								<>
+									<button
+										onClick={() =>
+											updateSegment("frequency", 1)
+										}
+									>
+										Aumentar frequência
+									</button>
+									<button
+										onClick={() =>
+											updateSegment("frequency", -1)
+										}
+									>
+										Diminuir frequência
+									</button>
+								</>
+							)}
+							{currentStage === "phase" && (
+								<button onClick={togglePhase}>
+									Alternar fase
+								</button>
+							)}
+						</div>
+						{allSegmentsCorrect && (
+							<div className="advance-button">
+								{currentStage !== "phase" ? (
+									<button
+										className="advance-stage-button"
+										onClick={advanceStage}
+									>
+										Avançar para{" "}
+										{currentStage === "amplitude"
+											? "Frequência"
+											: "Fase"}
+									</button>
+								) : (
+									<button
+										className="advance-stage-button"
+										onClick={goToChecksum}
+									>
+										Avançar para Checksum
+									</button>
+								)}
+							</div>
+						)}
+					</div>
+				</>
+			)}
 		</div>
 	);
 };

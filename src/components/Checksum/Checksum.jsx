@@ -5,12 +5,24 @@ const Checksum = ({ bits = "" }) => {
 	const [answers, setAnswers] = useState(Array(5).fill("")); // 5 quadrados para a resposta
 	const [checksumResult, setChecksumResult] = useState("");
 	const [isChecksumCorrect, setIsChecksumCorrect] = useState(null);
+	const [elapsedTime, setElapsedTime] = useState(0); // Estado para o cronômetro
+	const [isRunning, setIsRunning] = useState(true); // Controle do cronômetro
 
 	useEffect(() => {
 		if (bits.length !== 8) {
 			console.error("O número de bits deve ser 8.");
 		}
 	}, [bits]);
+
+	useEffect(() => {
+		let timer;
+		if (isRunning) {
+			timer = setInterval(() => {
+				setElapsedTime((prevTime) => prevTime + 1);
+			}, 1000);
+		}
+		return () => clearInterval(timer);
+	}, [isRunning]);
 
 	const handleInputChange = (e, index) => {
 		const { value } = e.target;
@@ -31,7 +43,12 @@ const Checksum = ({ bits = "" }) => {
 		const sum = topValue + bottomValue;
 		const checksum = sum.toString(2).padStart(5, "0").slice(-5); // 5 bits para a resposta
 		setChecksumResult(checksum);
-		setIsChecksumCorrect(checksum === answers.join(""));
+		const isCorrect = checksum === answers.join("");
+		setIsChecksumCorrect(isCorrect);
+
+		if (isCorrect) {
+			setIsRunning(false); // Para o cronômetro se o checksum estiver correto
+		}
 	};
 
 	return (
@@ -93,8 +110,8 @@ const Checksum = ({ bits = "" }) => {
 							}
 						>
 							{isChecksumCorrect
-								? "Checksum Correto!"
-								: "Checksum Incorreto!"}
+								? `Checksum correto!`
+								: "Checksum incorreto!"}
 						</p>
 					)}
 				</div>
